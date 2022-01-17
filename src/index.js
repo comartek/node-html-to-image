@@ -24,28 +24,37 @@ module.exports = async function (options) {
         puppeteerOptions: { ...puppeteerArgs, headless: false },
       });
 
-
   if (!cluster.ready) {
-    cluster.task(async ({ page, data: { content, output, selector } }) => {
-      const buffer = await makeScreenshot(page, {
-        ...options,
-        content,
-        output,
-        selector,
-      });
-      return buffer;
-    })
+    cluster.task(
+      async ({
+        page,
+        data: {
+          content: { html, ...content },
+          output,
+          selector,
+        },
+      }) => {
+        const buffer = await makeScreenshot(page, {
+          html,
+          content,
+          output,
+          selector,
+        });
+        return buffer;
+      }
+    );
     cluster.ready = true;
   }
-  
+
   const ctx = { ...content, output, selector };
   const { output: _output, selector: contentSelector, ...pageContent } = ctx;
 
   return cluster.execute({
     output: _output,
     content: {
+      html,
       ...pageContent,
     },
     selector: contentSelector ? contentSelector : selector,
   });
-}
+};
