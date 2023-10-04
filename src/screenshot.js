@@ -11,7 +11,7 @@ module.exports = {
     selector,
     beforeScreenshot,
     transparent = false,
-    waitUntil = 'networkidle0',
+    waitUntil = 'domcontentloaded',
   }) {
     let screeshotArgs = {}
     if (type === 'jpeg') {
